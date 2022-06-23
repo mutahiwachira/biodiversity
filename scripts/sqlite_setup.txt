@@ -1,0 +1,13 @@
+HOWTO: SQL Statements to import the csv
+cd into the directory containing the big csv
+Then run these statements
+
+```
+.open appsilon
+.mode csv
+.import occurence.csv occurence
+```
+
+It should create the table in about 15 minutes
+You have to first create the database called appsilon otherwise you'll run out of memory
+Name the table occurence, and do the same for the multimedia table.
