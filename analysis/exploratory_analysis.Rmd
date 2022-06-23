@@ -1,6 +1,37 @@
 Loading the polish data.
 
 ```{r}
-readr::read_csv("")
+occurence <- readr::read_csv("../data/poland_occurence.csv")
+problems()
 ```
+There are some column type issues so it's best to be explicit with the coltypes.
 
+# Reading the data with good column types
+
+# Notes
+
+```{r}
+glimpse(poland_data)
+```
+Okay so we have a lot of columns and we need to carefully go through each, understand and categorise it and also confirm the types.
+Maybe I need to make a data dictionary file in JSON or something.
+
+```{r}
+poland_data |> 
+  count(scientificName, vernacularName, sort = TRUE)
+```
+There are 1848 distinct species in the dataset (for Poland) and more than a 1000 observations of the four largest species.
+
+So in terms of the core technical requirements:
+
+* the search bar will have to accommodate both the scientificName and the vernacularName (or use a radio button to control which it looks in)
+* it will have to have a limit on how many you see in the dropdown otherwise it's just to many
+* it will have to load the vector of names as a small vector in memory so that it's fast - don't take from the db or even from the table column.
+* the timeline visualisation should be a lollipop chart of frequencies over time
+* the timeline visualisation should be interactive so that users can narrow down the time and it should then also filter the leaflet, just like highcharter and other htmlwidgets do
+* the map will need to use transparency if I use scatter points or it will have to be a heatmap or both if the observations are very dense
+* this is a nice opportunity to apply some of the techniques from Discrete Data Analysis (both descriptive and inferential techniques)
+  * Fisher's log-series distribution metric for species richness (inference and comparison). Make sure to note that obviously this wasn't a controlled expeirment, so not too much can be attributed to the inferred parameter value. It is useful for comparisons within the dataset and interpolation, not general extrapolatory statements.
+  * depending on the range of data, it might be interesting to track observations by season and present a visualisation of that
+  * relationship between different countries, similarity relationships (possibly migration?)
+  
