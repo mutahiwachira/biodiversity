@@ -1,0 +1,6 @@
+Loading the polish data.
+
+```{r}
+readr::read_csv("")
+```
+
