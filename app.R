@@ -1,42 +1,58 @@
 source("module_map.R")
+source("module_search_bar.R")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
-    # Application title
-    titlePanel("Biodiversity Dashboard"),
-
     # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
+    navbarPage(
+      "Biodiversity",
+      tabPanel(
+        "Occurence",
+        shiny::wellPanel(
+          search_ui("search", "Search by species")
         ),
-
+        br(),
         # Show a plot of the generated distribution
         mainPanel(
-           occurence_map_ui("main")
+          occurence_map_ui("spatial-plot")
         )
+      )
     )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
+  
+  
   get_data <- reactive({
     df <- load_polish_sample()
     return(df)
   })
   
-  get_data_to_plot <- reactive({
-    data <- get_data()
-    results_list <- get_occurence_data_to_plot(data, species = data$scientific_name[1:5])  
+  observe({search_server("search", get_data())})
+  
+  get_species_table <- reactive({
+    get_species_table()
   })
   
-  occurence_map_server("main", get_data_to_plot()$data_to_map)
+  get_data_to_plot <- reactive({
+    input$`main-search-button`
+    data         <- get_data()
+    search_terms = isolate({input$`main-search-bar`})
+    
+    if (!is.null(search_terms)) {
+      species <- get_species_selection(search_terms, data = data) 
+    }else {
+      species <- NULL
+    }
+    results_list <- get_occurence_data_to_plot(data = data, species = species)
+    
+    return(results_list)
+  })
+  
+  occurence_map_server("spatial-plot", get_data_to_plot()$data_to_map, reactive({input$`search-search-button`}))
 }
 
 # Run the application 

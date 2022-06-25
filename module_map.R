@@ -7,22 +7,20 @@ occurence_map_ui <- function(id) {
   )
 }
 
-occurence_map_server <- function(id, data_to_map) {
+occurence_map_server <- function(id, data_to_map, search_button) {
   moduleServer(
     id,
     function(input, output, session) {
       output$map <- renderLeaflet({
         
         # TODO: Configure the default view of the map
-        
         map_obj <- leaflet() |> 
           addTiles()
-        
         map_obj
       })
       
       # add observations
-      observe({
+      observeEvent(search_button(), {
         leafletProxy("map") |> 
           add_observations(data = data_to_map)
       })

@@ -7,13 +7,12 @@ load_polish_sample <- function(){
   return(df)
 }
 
-# get_lookup_table <- function(){
-#   # this table has two columns - scientific_name and common_name
-#   # we will use it for matching common_names to scientific
-#   # we use scientific names everywhere because they are unique and regular
-#   lookup_table <- readr::read_csv("data/species_names_lookup.csv")
-#   lookup_table
-# }
+get_species_table <- function(){
+  # this table has two columns - scientific_name and common_name
+  # we use it to populate the search bar
+  lookup_table <- readr::read_csv("data/species_names_lookup.csv")
+  lookup_table
+}
 
 # lookup_species <- function(lookup_table = get_lookup_table(), species){
 #   # if not supplied, then we read the lookup table from our data
@@ -48,10 +47,16 @@ qry_species <- function(data, species = NULL){
   # query only works with scientific name at low level design
   # higher level functions, UI, will always pass scientific names
   
-  if (is.null(species)) return(data)
-  
-  df <- data |> 
-    filter(scientific_name %in% species)
+  if (is.null(species) || length(species) == 0) {
+    # a temporary default!
+    # TODO
+    df <- data |> 
+      sample_n(50)
+    return(df)
+  } else {
+    df <- data |> 
+      filter(scientific_name %in% species)  
+  }
   
   return(df)
 }
@@ -59,7 +64,6 @@ qry_species <- function(data, species = NULL){
 qry_time_frame <- function(data, start = min(data$date), end = max(data$date)){
   start <- as_date(start)
   end   <- as_date(end)
-  
   df <- data |> 
     filter(date |> between(start, end))
   
@@ -75,7 +79,6 @@ qry_area <- function(data, coords_){
 # It's important to have this function because it aggregates over the time variable
 # It makes sure we don't overplot multiple observations in the same place from different times
 get_occurence_data_to_plot <- function(data, start = min(data_by_species$date), end = max(data_by_species$date), species = NULL){
-  
   data_by_species <- data |> 
     qry_species(species)
     # We made this object first so that, if not supplies, start and end can evaluate their min 
