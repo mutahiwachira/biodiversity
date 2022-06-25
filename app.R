@@ -1,3 +1,5 @@
+source("module_map.R")
+
 # Define UI for application that draws a histogram
 ui <- fluidPage(
 
@@ -16,38 +18,25 @@ ui <- fluidPage(
 
         # Show a plot of the generated distribution
         mainPanel(
-           leafletOutput("main_map")
+           occurence_map_ui("main")
         )
     )
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-
+  
   get_data <- reactive({
     df <- load_polish_sample()
     return(df)
   })
   
-  output$main_map <- renderLeaflet({
-    
-    # TODO: Configure the default view of the map
-    
-    map_obj <- leaflet() |> 
-      addTiles()
-    
-    map_obj
+  get_data_to_plot <- reactive({
+    data <- get_data()
+    results_list <- get_occurence_data_to_plot(data, species = data$scientific_name[1:5])  
   })
   
-  # add observations
-  observe({
-    data <- get_data()
-    results_list <- get_occurence_data_to_plot(data, species = data$scientific_name[[1]])
-    data_to_map <- results_list$data_to_map
-    browser()
-    leafletProxy("main_map") |> 
-      add_observations(data = data_to_map)
-  })
+  occurence_map_server("main", get_data_to_plot()$data_to_map)
 }
 
 # Run the application 
