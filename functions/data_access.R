@@ -44,16 +44,14 @@ load_polish_sample <- function(){
 
 
 ## Query Functions ----
-qry_species <- function(data, species){
+qry_species <- function(data, species = NULL){
   # query only works with scientific name at low level design
   # higher level functions, UI, will always pass scientific names
   
-  if(length(scientific_name) > 0){
-    # use scientific names if supplied
-  }
+  if (is.null(species)) return(data)
   
   df <- data |> 
-    filter(scientific_name %in% scientific_name)
+    filter(scientific_name %in% species)
   
   return(df)
 }
@@ -68,15 +66,27 @@ qry_time_frame <- function(data, start = min(data$eventDate), end = max(data$eve
   return(df)
 }
 
+qry_area <- function(data, coords_){
+  # TODO: write a function to query the data based on given set of coordinates.
+  # There is probably a convenience function for this in a package like sf - don't reinvent the wheel.
+}
+
 # This function gets the basic counts for a given time range and species to map
 # It's important to have this function because it aggregates over the time variable
 # It makes sure we don't overplot multiple observations in the same place from different times
-get_data_to_map <- function(data, start = min(data$eventDate), end = max(data$eventDate), scientific_name = NULL, common_name = NULL){
-  data |> 
-    qry_species(scientific_name, common_name) |> 
+get_occurence_data_to_plot <- function(data, plot_type = c("map", "trend"), start = min(data_by_species$eventDate), end = max(data_by_species$eventDate), species = NULL){
+  plot_type <- match.arg(plot_type, c("map", "trend"))
+  
+  data_by_species <- data |> 
+    qry_species(species)
+    # We made this object first so that, if not supplies, start and end can evaluate their min 
+    # and max lazily from this smaller dataset
+  
+  df <- data_by_species
     qry_time_frame(start, end) |> 
-    group_by(-date)
+    group_by(longitude, latitude, country, scientific_name) |> 
+    summarise(count = sum(count), .groups = "drop") |> 
+    ungroup()
 }
-
 # Tests to implement
 
