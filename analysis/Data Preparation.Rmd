@@ -3,6 +3,9 @@ title: "Creating views"
 author: "Mutahi"
 date: '2022-06-25'
 output: html_document
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 ```{r setup, include=FALSE}
@@ -17,35 +20,37 @@ This data was loaded into a sqlite table and inspected.
 A csv of the data for just the nation of Poland was also analysed in R as a sample from the whole dataset.
 Several important facts about the data were noted which will have an impact on both the visualisation and performance:
 
-* Each record in the dataset includes a count variable, so it is not the case that each record is a single observation
-* The columns for ID, occurenceID, catalogNumber and reference make up more than half of the data size, with the first three being highly redundant in their nature (all basically use the ID).
-* Many of the columns are superfluous and only a handful of key columns are required. The information we really need is:
-  * Date
-  * Latitude
-  * Longitude
-  * Country
-  * Species Scientific Name
-  * Species Common Name
-  * Count of Individuals
-  * (Information about biological classification, e.g. plant or animal, may be useful later on and can be added in via a join, together with multimedia information on each species)
-* All the columns are saved as characters, which is an storage expensive way to store information.
-  
-This notebook attempts to use the Polish data to perform basic data cleaning and define the views and data validation that will be required into the data to provide meaningful visualisations efficiently. It focuses on the occurence data.
+-   Each record in the dataset includes a count variable, so it is not the case that each record is a single observation
+-   The columns for ID, occurenceID, catalogNumber and reference make up more than half of the data size, with the first three being highly redundant in their nature (all basically use the ID).
+-   Many of the columns are superfluous and only a handful of key columns are required. The information we really need is:
+    -   Date
+    -   Latitude
+    -   Longitude
+    -   Country
+    -   Species Scientific Name
+    -   Species Common Name
+    -   Count of Individuals
+    -   (Information about biological classification, e.g. plant or animal, may be useful later on and can be added in via a join, together with multimedia information on each species)
+-   All the columns are saved as characters, which is an storage expensive way to store information.
+
+This notebook attempts to use the Polish data to perform basic data cleaning and define the views and data validation that will be required into the data to provide meaningful visualisations efficiently.
+It focuses on the occurence data.
 
 # Data Processing
 
 ```{r}
 df <- readr::read_csv("../data/poland_occurence.csv")
 ```
+
 ## Creating a main table
 
 Our goal is to keep only the data we need, in an efficient form, to visualise and score biodiversity geospatially.
 We have to
 
-* choose the right columns
-* convert to the right types of data
-* transform the latitudes and longitudes to bin observations together within a fixed radius
-* sum up the counts so that we have each row of our table showing the count of all individuals of a given species in a particular area of a country on a particular day - each record's count value should be the actual total count given all the rest of the information
+-   choose the right columns
+-   convert to the right types of data
+-   transform the latitudes and longitudes to bin observations together within a fixed radius
+-   sum up the counts so that we have each row of our table showing the count of all individuals of a given species in a particular area of a country on a particular day - each record's count value should be the actual total count given all the rest of the information
 
 We will then write this as a SQL statement to create the main view (or possibly even save is as a table.)
 
@@ -61,7 +66,8 @@ df_selected <- df |>
   select(all_of(c(main_columns, extra_columns)))
 ```
 
-Now we need to allocate the correct data types. R correctly infers these in general, but let us be explicit because we need to know this for writing our view.
+Now we need to allocate the correct data types.
+R correctly infers these in general, but let us be explicit because we need to know this for writing our view.
 Let us also rename our columns while we're at it.
 
 ```{r}
@@ -80,22 +86,26 @@ df_transformed <- df_selected |>
 
 Next, to bin the observations.
 
-One degree of latitude defines a length of about 100km. One degree of longitude defines a varying length depending on the latitude, but it is about 1000km. 
+One degree of latitude defines a length of about 100km.
+One degree of longitude defines a varying length depending on the latitude, but it is also about 100km (at the equator).
+See [here for details](https://earthscience.stackexchange.com/questions/6843/how-much-distance-does-0-001-circ-in-latitude-or-longitude-represent#:~:text=So%2C%20for%20latitude%20the%20number,football%20field%20plus%20both%20endzones.).
+
 If we were to round our latitudes and longitudes to the nearest tenth, we would be defining an area of about 10km by 100km.
 Let us try to round our latitudes and longitudes so that we get an area of about 50km by 50km.
 
-If 1 latitude degree gives us 100km, then 1/10th of one degree (one decimal degree) gives us 10km. So we want 5/10ths of a decimal degree. We want to round our latitude to the nearest half degree like this
+If 1 latitude degree gives us 100km, then 1/10th of one degree (one decimal degree) gives us 10km.
+So we want 5/10ths of a decimal degree.
+We want to round our latitude to the nearest half degree like this
 
 ```{r}
 test_vec <- c(52.21380, 53.36764, 53.38855)
 round(test_vec*2/1,0)*1/2
 ```
-And for longitude, if one degree of longitude gives us 1000km, then 1/10th degree of longitude gives us 100km, so 1/100th degree of longitude gives us 10km, so we want 5/100th degrees of longitude, roughly.
 
-```{r}
-round(test_vec*100/5,0)*5/100
-```
+The same applies for longitude
+
 Or, as a function
+
 ```{r}
 round_to_the_n_over_d <- function(x, n, d){
   round(x*d/n,0)*n/d
@@ -108,7 +118,7 @@ We can bin our data and then plot it on a map to make sure we are in the same pl
 df_binned <- df_transformed |> 
   mutate(
     latitude = round_to_the_n_over_d(latitude, 5, 10),
-    longitude = round_to_the_n_over_d(longitude, 5, 100)
+    longitude = round_to_the_n_over_d(longitude, 5, 10)
   )
 ```
 
@@ -134,7 +144,13 @@ leaflet() |>
   addCircleMarkers(lng = ~lng, lat = ~lat, data = original_points, color = "blue", stroke = FALSE,fillOpacity = 0.4) |> 
   addCircleMarkers(lng = ~lng, lat = ~lat, data = new_points, color = "red", stroke = FALSE,fillOpacity = 0.4)
 ```
-The example shows that the binning is not too bad. Interestingly in this example it moved the points over a border. In some sense this is not desirable, but in others it is. The actual ecosystems cross the borders, it isn't totally incorrect to cross the border. A research team trying to understand biological diversity in a border region would probably get permits to study on both sides of the border. For the global data, we need not even invoke national boundaries at all, so I will classify this rounding as a success.
+
+The example shows that the binning is not too bad.
+Interestingly in this example it moved the points over a border.
+In some sense this is not desirable, but in others it is.
+The actual ecosystems cross the borders, it isn't totally incorrect to cross the border.
+A research team trying to understand biological diversity in a border region would probably get permits to study on both sides of the border.
+For the global data, we need not even invoke national boundaries at all, so I will classify this rounding as a success.
 
 Now we just have to aggregate our binned data.
 
@@ -145,11 +161,13 @@ df_aggregated <- df_binned |>
   summarise(count = sum(count), .groups = "drop") |> 
   ungroup()
 ```
+
 There should be as many individuals as there were before:
 
 ```{r}
 sum(df_aggregated$count) == sum(df_binned$count)
 ```
+
 So now we can summarise our workflow for doing initial processing and try to convert that to sql with dbplyr:
 
 ```{r}
@@ -182,11 +200,13 @@ processed_data <- raw_data |>
   ungroup()
 
 ```
+
 We can compare the ratio of the object sizes to see how much better this is from a performance point of view.
 
 ```{r}
 as.numeric(object.size(raw_data))/as.numeric(object.size(processed_data))
 ```
+
 We are working with something 1/20th the size.
 
 Let us try to get the SQL query from dbplyr, because it might be easier than trying to write it ourselves.
@@ -226,7 +246,7 @@ processed_db_data <- raw_db_data |>
   # bin the points by rounding
   mutate(
     latitude = round(latitude*10/5,0)*5/10,
-    longitude = round(longitude*100/5,0)*5/100
+    longitude = round(longitude*10/5,0)*5/10
   ) |> 
 
   # and aggregate
@@ -240,13 +260,15 @@ dbDisconnect(con)
 ```{r}
 show_query(processed_db_data)
 ```
-Which is very ugly and probably non-optimal SQL. But it is good because it is the result of a workflow we trust.
+
+Which is very ugly and probably non-optimal SQL.
+But it is good because it is the result of a workflow we trust.
 
 Running the query on my computer took about 45 seconds.
 
 I had to make the following corrections to the sql:
 
-* the CAST to date didn't work, I replaced the line with using the date() function: date(`date`) AS `date`,
+-   the CAST to date didn't work, I replaced the line with using the date() function: date(`date`) AS `date`,
 
 We will have to write this data as a table, rather than as a view.
 
@@ -254,7 +276,13 @@ The final table has about 60% of the data.
 
 Finally, after making the table and exporting, I get a csv for the biodiversity_poland data (i.e. the processed data) of size 2MB.
 
------
+------------------------------------------------------------------------
 
-Extra notes
-* I realised later that we shouldn't uses the common names in this table because they are irregular, and prevent efficient aggregation. This has been removed in the final SQL code.
+# Corrections
+
+-   I realised later that we shouldn't uses the common names in this table because they are irregular, and prevent efficient aggregation.
+    This has been removed in the final SQL code.
+
+-   I was wrong in my calculation for the meters from latitude and longitude.
+    You should treat one degree of both as being roughly about 111m (ignoring how it varies for longitude).
+    <https://earthscience.stackexchange.com/questions/6843/how-much-distance-does-0-001-circ-in-latitude-or-longitude-represent#:~:text=So%2C%20for%20latitude%20the%20number,football%20field%20plus%20both%20endzones.>
