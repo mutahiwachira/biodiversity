@@ -4,4 +4,7 @@ library(leaflet)
 library(DBI)
 library(RSQLite)
 library(dbplyr)
+library(lubridate)
 
+source("functions/data_access.R")
+source("functions/spatial_maps.R")

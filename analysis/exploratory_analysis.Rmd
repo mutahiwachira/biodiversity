@@ -1,3 +1,5 @@
+Exploratory Analysis and Ideation about the app.
+
 Loading the polish data.
 
 ```{r}
@@ -34,4 +36,10 @@ So in terms of the core technical requirements:
   * Fisher's log-series distribution metric for species richness (inference and comparison). Make sure to note that obviously this wasn't a controlled expeirment, so not too much can be attributed to the inferred parameter value. It is useful for comparisons within the dataset and interpolation, not general extrapolatory statements.
   * depending on the range of data, it might be interesting to track observations by season and present a visualisation of that
   * relationship between different countries, similarity relationships (possibly migration?)
-  
+  * relationships between different species (co-occurence modelling)
+
+Basic framework for any insights
+* Visual vocabulary: gives you the categories of questions to ask (trends over time, composition...). Then present the data and visualise, then do some minor modelling or summarising, then present the results nicely again.
+
+* Other useful features
+* Download CSV (require data privacy agreement?)
