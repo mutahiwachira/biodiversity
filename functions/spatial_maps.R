@@ -1,12 +1,4 @@
 # 1.0 Core mappint utilities ---- 
-
-make_df_to_map <- function(data){
-  # from the raw data, prepare the df we need to draw the map efficiently
-  data |> 
-    select(lng = longitudeDecimal, lat = latitudeDecimal) |> 
-    sample_n(1000)
-}
-
 draw_base_map <- function(df_to_map, ...){
   df_to_map |> 
     leaflet() |> 
@@ -15,7 +7,7 @@ draw_base_map <- function(df_to_map, ...){
 
 add_observations <- function(leaflet_obj, data){
   leaflet_obj |> 
-    addCircleMarkers(stroke = FALSE, data = data)
+    addCircleMarkers(stroke = FALSE, lng = ~longitude, lat = ~latitude, data = data, fillOpacity = 0.9)
 }
 
 # 2.0 Geometry utilities; Calculate bounds and positions ----

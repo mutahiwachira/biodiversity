@@ -56,7 +56,7 @@ qry_species <- function(data, species = NULL){
   return(df)
 }
 
-qry_time_frame <- function(data, start = min(data$eventDate), end = max(data$eventDate)){
+qry_time_frame <- function(data, start = min(data$date), end = max(data$date)){
   start <- as_date(start)
   end   <- as_date(end)
   
@@ -74,19 +74,30 @@ qry_area <- function(data, coords_){
 # This function gets the basic counts for a given time range and species to map
 # It's important to have this function because it aggregates over the time variable
 # It makes sure we don't overplot multiple observations in the same place from different times
-get_occurence_data_to_plot <- function(data, plot_type = c("map", "trend"), start = min(data_by_species$eventDate), end = max(data_by_species$eventDate), species = NULL){
-  plot_type <- match.arg(plot_type, c("map", "trend"))
+get_occurence_data_to_plot <- function(data, start = min(data_by_species$date), end = max(data_by_species$date), species = NULL){
   
   data_by_species <- data |> 
     qry_species(species)
     # We made this object first so that, if not supplies, start and end can evaluate their min 
     # and max lazily from this smaller dataset
   
-  df <- data_by_species
-    qry_time_frame(start, end) |> 
-    group_by(longitude, latitude, country, scientific_name) |> 
-    summarise(count = sum(count), .groups = "drop") |> 
+  data_within_range <- data_by_species |> 
+    qry_time_frame(start, end)
+  
+  data_to_trend <- data_within_range |> 
+    group_by(date, country, scientific_name) |> 
+    summarise(count = sum(count), .groups = "drop") |> # for the trend data, we aggregate out the locations
     ungroup()
+  
+  data_to_map <- data_within_range |> 
+    group_by(longitude, latitude, country, scientific_name) |> 
+    summarise(count = sum(count), .groups = "drop") |> # for the map data, we aggregate out the dates
+    ungroup()
+  
+  # We aggregate out these results to make the data required on each plot smaller, improving plot performance.
+  # We return both of these plots from the very same function so that these data are always in sync.
+  
+  return(list(data_to_trend = data_to_trend, data_to_map = data_to_map))
 }
 # Tests to implement
 
