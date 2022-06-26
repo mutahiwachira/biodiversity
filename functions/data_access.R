@@ -5,7 +5,7 @@ db_get_occurence_data_by_country <- function(country = "Poland"){
   con <- DBI::dbConnect(RSQLite::SQLite(),"data/appsilon")
   
   country_value = country
-  df_occurence <- tbl(con, "occurence_non_nl") |> 
+  df_occurence <- tbl(con, "occurence_processed") |> 
     filter(country == country_value) |> 
     collect()  # for now let's load into memory until we have benchmarked performance.
   
