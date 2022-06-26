@@ -7,7 +7,7 @@ occurence_map_ui <- function(id) {
   )
 }
 
-occurence_map_server <- function(id, data_to_map, search_button) {
+occurence_map_server <- function(id, data_to_map) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -20,7 +20,7 @@ occurence_map_server <- function(id, data_to_map, search_button) {
       })
       
       # add observations
-      observeEvent(search_button(), {
+      observe({
         leafletProxy("map") |> 
           add_observations(data = data_to_map)
       })
