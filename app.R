@@ -24,7 +24,8 @@ server <- function(input, output) {
   
   
   get_data <- reactive({
-    df <- db_get_occurence_data_by_country()
+    country <- input$`controls-country_selector`
+    df <- db_get_occurence_data_by_country(country)
     return(df)
   })
   
@@ -35,9 +36,9 @@ server <- function(input, output) {
   })
   
   get_data_to_plot <- reactive({
-    input$`search-search-button`
+    input$`controls-search-button`
     data         <- get_data()
-    search_terms = isolate({input$`search-search-bar`})
+    search_terms = isolate({input$`controls-search-bar`})
     
     if (!is.null(search_terms)) {
       species <- get_species_selection(search_terms, data = data) 
@@ -51,8 +52,9 @@ server <- function(input, output) {
   })
   observe({
     input$`controls-search-button`
+    country_focus <- input$`controls-country_selector`
     results <- get_data_to_plot()
-    occurence_map_server("spatial-plot", results$data_to_map)
+    occurence_map_server("spatial-plot", results$data_to_map, country_focus)
     trendline_server("trend-plot", results$data_to_trend)
   })
   

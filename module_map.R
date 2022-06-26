@@ -7,15 +7,20 @@ occurence_map_ui <- function(id) {
   )
 }
 
-occurence_map_server <- function(id, data_to_map) {
+occurence_map_server <- function(id, data_to_map, country_focus) {
   moduleServer(
     id,
     function(input, output, session) {
       output$map <- renderLeaflet({
         
+        view_coords <- global_variables$countries |> 
+          filter(country == country_focus)
+        country_focus
         # TODO: Configure the default view of the map
         map_obj <- leaflet() |> 
-          addTiles()
+          addTiles() |> 
+          setView(lng = view_coords$longitude, lat = view_coords$latitude, zoom = 5)
+        
         map_obj
       })
       

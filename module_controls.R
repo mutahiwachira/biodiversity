@@ -12,7 +12,7 @@ controls_ui <- function(id) {
         id = ns("app-settings"),
         style = "display: none",
         hr(),
-        selectInput(ns("country_selector"), "Country", choices = global_variables$countries$country)
+        selectInput(ns("country_selector"), "Country", choices = global_variables$countries$country, selected = "Poland")
       )
     )
     
@@ -29,6 +29,7 @@ controls_server <- function(id, data) {
       
       observeEvent(input$settings_button, {
         #shinyjs::toggle(id = paste0(id, "-app-settings"),anim = TRUE, asis = TRUE)
+        browser()
         session$sendCustomMessage(type = "toggle", message = paste0(id, "-app-settings"))
       })
       
