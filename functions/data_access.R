@@ -1,11 +1,29 @@
 # 1.0 OCCURENCE DATA ----
 
-## CSV Access / Database Access functions ----
-load_data_by_country <- function(){
-  # Loads the polish csv data, a smaller dataframe for testing purposes
-  df <- readr::read_csv("data/biodiversity_poland.csv")
-  return(df)
+db_get_occurence_data_by_country <- function(country = "Poland"){
+  # TODO: Validation of country input; match.arg
+  con <- DBI::dbConnect(RSQLite::SQLite(),"data/appsilon")
+  
+  country_value = country
+  df_occurence <- tbl(con, "occurence_non_nl") |> 
+    filter(country == country_value) |> 
+    collect() # for now let's load into memory until we have benchmarked performance.
+  
+  dbDisconnect(con)
+  
+  return(df_occurence)
 }
+
+db_get_countries <- function(){
+  con <- DBI::dbConnect(RSQLite::SQLite(),"data/appsilon")
+  
+  countries_df <- tbl(con,"view_dim_countries") |> 
+    collect()
+  dbDisconnect(con)
+  
+  return(countries_df)
+}
+## CSV Access / Database Access functions ----
 
 get_species_table <- function(){
   # this table has two columns - scientific_name and common_name

@@ -1,6 +1,4 @@
-source("module_map.R")
-source("module_search_bar.R")
-source("module_trendline.R")
+source("global.R")
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -29,7 +27,7 @@ server <- function(input, output) {
   
   
   get_data <- reactive({
-    df <- load_polish_sample()
+    df <- db_get_occurence_data_by_country()
     return(df)
   })
   
