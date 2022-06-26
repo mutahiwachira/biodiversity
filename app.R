@@ -1,16 +1,13 @@
 source("global.R")
 
-# Define UI for application that draws a histogram
 ui <- fluidPage(
-
-    # Sidebar with a slider input for number of bins 
+    tags$script(src = "toggle.js"),
     navbarPage(
       "Biodiversity",
+      
       tabPanel(
         "Occurence",
-        shiny::wellPanel(
-          search_ui("search", "Search by species")
-        ),
+        controls_ui("controls"),
         br(),
         # Show a plot of the generated distribution
         fluidRow(
@@ -18,10 +15,10 @@ ui <- fluidPage(
           column(6, occurence_map_ui("spatial-plot"))
         )
       )
+      
     )
 )
 
-# Define server logic required to draw a histogram
 server <- function(input, output) {
   
   
@@ -31,7 +28,7 @@ server <- function(input, output) {
     return(df)
   })
   
-  observe({search_server("search", get_data())})
+  observe({controls_server("controls", get_data())})
   
   get_species_table <- reactive({
     get_species_table()
@@ -53,7 +50,7 @@ server <- function(input, output) {
     return(results_list)
   })
   observe({
-    input$`search-search-button`
+    input$`controls-search-button`
     results <- get_data_to_plot()
     occurence_map_server("spatial-plot", results$data_to_map)
     trendline_server("trend-plot", results$data_to_trend)
@@ -61,5 +58,4 @@ server <- function(input, output) {
   
 }
 
-# Run the application 
 shinyApp(ui = ui, server = server)

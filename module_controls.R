@@ -1,18 +1,37 @@
-search_ui <- function(id, label, choices = NULL) {
+controls_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    shiny::selectizeInput(ns("search-bar"), label, choices = NULL, multiple = TRUE),
-    actionButton(ns("search-button"), "Search", icon = icon("search"))# initialize empty, update with server.
+    shiny::wellPanel(
+      shiny::selectizeInput(ns("search-bar"), label = "Choose a species", choices = NULL, multiple = TRUE),
+      actionButton(ns("search-button"), "Search", icon = icon("search")), # initialize empty, update with server.
+      div(
+        class = "pull-right",
+        actionButton(inputId = ns("settings_button"), label = NULL, icon = icon("cog"))
+      ),
+      div(
+        id = ns("app-settings"),
+        style = "display: none",
+        hr(),
+        selectInput(ns("country_selector"), "Country", choices = global_variables$countries$country)
+      )
+    )
+    
   )
 }
 
-search_server <- function(id, data) {
+controls_server <- function(id, data) {
   # this should take in a non-reactive, global data value as much as possible
   # we don't want to trigger these components every time you make a minor adjustment to the map
   # only when you switch countries or something like that
   moduleServer(
     id,
     function(input, output, session) {
+      
+      observeEvent(input$settings_button, {
+        #shinyjs::toggle(id = paste0(id, "-app-settings"),anim = TRUE, asis = TRUE)
+        session$sendCustomMessage(type = "toggle", message = paste0(id, "-app-settings"))
+      })
+      
       searchbar_table <- make_searchbar_vals_table(data)
       
       updateSelectizeInput(session, "search-bar", choices = searchbar_table$vals, server = TRUE) #server-side selectize for performance improvement

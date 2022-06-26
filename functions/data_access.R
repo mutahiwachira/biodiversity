@@ -7,7 +7,10 @@ db_get_occurence_data_by_country <- function(country = "Poland"){
   country_value = country
   df_occurence <- tbl(con, "occurence_non_nl") |> 
     filter(country == country_value) |> 
-    collect() # for now let's load into memory until we have benchmarked performance.
+    collect()  # for now let's load into memory until we have benchmarked performance.
+  
+  # TODO: Extract to proper function for validating data types
+  df_occurence$date <- as_date(df_occurence$date)
   
   dbDisconnect(con)
   
