@@ -1,7 +1,7 @@
 # 1.0 OCCURENCE DATA ----
 
 ## CSV Access / Database Access functions ----
-load_polish_sample <- function(){
+load_data_by_country <- function(){
   # Loads the polish csv data, a smaller dataframe for testing purposes
   df <- readr::read_csv("data/biodiversity_poland.csv")
   return(df)
@@ -13,34 +13,6 @@ get_species_table <- function(){
   lookup_table <- readr::read_csv("data/species_names_lookup.csv")
   lookup_table
 }
-
-# lookup_species <- function(lookup_table = get_lookup_table(), species){
-#   # if not supplied, then we read the lookup table from our data
-#   # but the function allows you to supply it so that we minimize our dependence on read/write operations
-#   # the lookup table won't be too big and is something we might like to keep in memory because it is used always.
-#   
-#   # TODO: validate lookup table: can't have the same common name refer to two different scientific names
-#   
-#   # Use a common name to get a scientific_name
-#   all_scientific_names <- lookup_table$scientific_name
-#   
-#   species_scientific <- species[species %in% all_scientific_names]
-#   species_common     <- species[!species %in% all_scientific_names]
-#   
-#   # check if the species other is in the lookup table
-#   
-#   common_name_val <- common_name # otherwise filter doesn't work right - treats it as column == column
-#   scientific_names <- lookup_table |> 
-#     filter(common_name == common_name_val) |> 
-#     pull(scientific_name)
-#   
-#   # TODO: Defensive programming - the vectors should be the same length!
-#   
-#   # TODO: Defensive programming - what if they enter a nonsense value for the name?
-#   
-#   return(scientific_names)
-# }
-
 
 ## Query Functions ----
 qry_species <- function(data, species = NULL){
