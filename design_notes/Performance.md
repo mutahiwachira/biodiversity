@@ -41,8 +41,24 @@ Some important rules for doing efficient visualisations:
 
 ------
 
-# Improvements and Future Directions
+# Potential for Improvement
 
-* Do corrections to the longitude and latitude roundings to make sure that they respect the geometry of the Earth (km/longitude-degree is not constant as we assumed)
+The overall goal for performance is to be able to load in global data
+Initially, this would be providing an option for people to specify the country they want to look at
+But in the very long run, it might be useful to work with all the data (perhaps not plotting all of it) so that we can get information within an international context (e.g. birds that migrate between South Africa and Poland are important to know about so that the Polish and South African governments can jointly secure their biodiversity, each one dependent on the other)
+These performance enhancements are necessary only toward that end:
+
 * Consider a proper SQL scheme to process the entire data, not just for Poland
 * Consider using the fastverse suite of packages (collapse, kit, matrixStats, data.table) if you need much faster statistical and matrix calculations 
+
+## Using a database instead of CSVs
+
+* For a fixed data db, you can create all the tables you want once-off and then just query them with DBI and dbplyr.
+* 
+
+## Fastverse
+
+Several packages from the *fastverse* suite of tools present possible opportunities for speeding up what data processing must be done in R/Shiny:
+* collapse provides very fast statistical functions
+* matrixStats provides powerful matrix operations and calculations; it also reminds us that we don't always have to work with dataframes which are bulky compared to matrices
+* data.table provides a massive speed boost for sorting and joining and even for simple calculations it is great because the `:=` operator allows you to modify in place, you just have to be very careful to get the semantics right and not accidentally override important objects. Generally, copy once at the beginning of a function and then within a function use modify-in-place. Try to declare where you are using data.table explicitly, because it's semantics for square brackets are so different to data.frame and this can be a source of confusion.

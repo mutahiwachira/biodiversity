@@ -1,0 +1,3 @@
+# Improvements
+
+* Do corrections to the longitude and latitude roundings to make sure that they respect the geometry of the Earth (km/longitude-degree is not constant as we assumed). Find a meaningful and accurate method of binning the geographical data and demonstrate it's correctness and appropriate performance characteristics. k-means might be more appropriate but it would be very expensive and difficult. 
