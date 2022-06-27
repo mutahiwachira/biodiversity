@@ -18,7 +18,7 @@ There are serious problems with the requirement in terms of the stated goal of t
 
 * number of species in an area (known as species richness in ecology) is probably more important than the count of individuals of a given species
 * in terms of preserving species, we actually want to emphasize species, locations, and periods of time were the number of observations is small or falling. Plotting the observations as they are, aggregated or raw, actually dilutes and hides those species which are rare are losing population, which are the very species we care the most about. But plotting the inverse or negative of counts is not visually intuitive either.
-* counts of species are, by their nature, small numbers with a fairly small distribution. Usually single digit observations, even when aggregated. Time series of small counts with large gaps between them do not look good visually. And the actual numerical value of the count tells you much less about species rarity because most species are rare and will only be osberved so often.
+* counts of species are, by their nature, small numbers with a fairly small distribution. Usually single digit observations, even when aggregated. Time series of small counts with large gaps between them do not look good visually. And the actual numerical value of the count tells you much less about species rarity because most species are rare and will only be observed so often.
 
 Here are some recommendations to improve the app:
 
