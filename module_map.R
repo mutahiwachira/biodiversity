@@ -42,6 +42,11 @@ draw_base_map <- function(df_to_map, ...){
 }
 
 add_observations <- function(leaflet_obj, data){
+  
+  # Abbreviate species name to save plot space
+  data <- data |> 
+    mutate(scientific_name = abbreviate_scientific_names(scientific_name))
+  
   sizes <- data |> 
     pull(count) |> 
     scale_counts_to_sizes(lb = 10, ub = 15) # map the range of counts 

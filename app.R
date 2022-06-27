@@ -5,9 +5,9 @@ ui <- navbarPage(
       tags$script(src = "toggle.js"),
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
     ),
-    title = "Biodiversity",
+    title = "Biodiversity Explorer",
     tabPanel(
-      "Occurence",
+      "Species Occurence",
       div(class = "container",
           style = "max-width: 1500px; height: 1500px;",
           controls_ui("controls"),

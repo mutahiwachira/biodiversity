@@ -13,6 +13,10 @@ trendline_server <- function(id, data) {
       
       output$plot <- renderPlotly({
         
+        # Shorter species names
+        data <- data |> 
+          mutate(scientific_name = abbreviate_scientific_names(scientific_name))
+        
         # Match the colours and species so you can feed it to ggplot2 scale_color_manual.
         unique_species <- sort(unique(data$scientific_name))
         colpal <- c("Black", "Blue", "Red")
@@ -50,7 +54,7 @@ trendline_server <- function(id, data) {
             xaxis = list(title = list(text = NULL), tickfont = list(family = "Arial", size = 16)),
             yaxis = list(title = list(text = NULL), tickfont = list(family = "Arial", size = 16)),
             showlegend = TRUE,
-            legend = list(font = list(size = 14), text = "Species", orientation = "h"))
+            legend = list(x = 0, y = -0.3, font = list(size = 14), text = "Species", orientation = "h"))
         
         # Make the tooltip data
         
@@ -60,4 +64,16 @@ trendline_server <- function(id, data) {
       
     }
   )
+}
+
+# Utility functions
+
+abbreviate_scientific_names <- function(full_name){
+  # Vectorised function to change long species names to abbreviated forms for neater time plots
+  full_name <- str_split(full_name, " ",simplify = TRUE)
+  genus <- full_name[,1] |> str_sub(1,1) |> str_c(".")
+  species <- full_name[,2]
+  res <- str_c(genus, species,sep = " ")
+  
+  return(res)
 }
