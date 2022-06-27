@@ -47,9 +47,9 @@ add_observations <- function(leaflet_obj, data){
   data <- data |> 
     mutate(scientific_name = abbreviate_scientific_names(scientific_name))
   
-  sizes <- data |> 
-    pull(count) |> 
-    scale_counts_to_sizes(lb = 10, ub = 15) # map the range of counts 
+  # Map the range of counts
+  data <- data |> 
+    mutate(sizes = scale_counts_to_sizes(count, lb = 5, ub = 15))  
 
   colpal <- c("Black", "Blue", "Red")
   unique_species <- as_factor(sort(unique(data$scientific_name)))
@@ -63,11 +63,12 @@ add_observations <- function(leaflet_obj, data){
   for (i in seq_along(data_by_species)){
     leaflet_obj <- leaflet_obj |> 
       addCircleMarkers(stroke = TRUE, color = "black", weight = 0.5, opacity = 0.9, 
-                 lng = ~longitude + jitter[i], lat = ~latitude + jitter[i], data = data_by_species[[i]],
+                 lng = ~longitude + jitter[i], lat = ~latitude + jitter[i], label = ~htmltools::htmlEscape(text = as.character(count)),
+                 data = data_by_species[[i]],
                  group = group_labels[i],
                  fillOpacity = 0.7,
                  fillColor = colpal[i],
-                 radius = sizes)
+                 radius = ~sizes)
   }
   
   leaflet_obj <- leaflet_obj |> 
