@@ -1,7 +1,8 @@
 trendline_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    plotlyOutput(ns("plot"))
+    main_box("What is the trend in population numbers?",
+             plotlyOutput(ns("plot")))
   )
 }
 
@@ -11,17 +12,50 @@ trendline_server <- function(id, data) {
     function(input, output, session) {
       
       output$plot <- renderPlotly({
+        
+        # Match the colours and species so you can feed it to ggplot2 scale_color_manual.
+        unique_species <- sort(unique(data$scientific_name))
+        colpal <- c("Black", "Blue", "Red")
+        colpal <- colpal[seq_along(unique_species)] # should never get more than 3 species, but can be less
+        names(colpal) <- unique_species
+        
+        data <- data %>% 
+          mutate(species = as_factor(scientific_name)) |> 
+          select(Date = date, Count = count, Species = species)
+        
         lollipop_plot <- data |> 
-          ggplot(aes(x = date, y = count, group = scientific_name)) + 
-          geom_point(color = "black", size = 2) + 
-          geom_segment(aes(x=date, xend=date, y=0, yend=count), size = 0.1, color = "black") +
+          ggplot(aes(x = Date, y = Count, color = Species))
+        
+        lollipop_plot <- lollipop_plot +
+          geom_point(size = 2) +
+          geom_segment(aes(x=Date, xend=Date, y=0, yend=Count), size = 0.1) +
+          scale_color_manual(values = colpal, aesthetics = c("color"))
+         
+        lollipop_plot <- lollipop_plot +
           theme_light() +
           theme(
-            panel.grid.major = element_blank(), 
-            panel.grid.minor = element_blank()
-          )
+           panel.grid.major = element_blank(),
+           panel.grid.minor = element_blank(),
+         )
         
-        ggplotly(lollipop_plot)
+        lollipop_plot <- lollipop_plot + 
+          theme_light()
+        
+        interactive_plot <- ggplotly(lollipop_plot)
+        
+        interactive_plot <- interactive_plot |> 
+          layout(
+            font = list(family = "Arial", size = 16),
+            title = list(font = list(size = 18), text = "Number of observations by month"),
+            xaxis = list(title = list(text = NULL), tickfont = list(family = "Arial", size = 16)),
+            yaxis = list(title = list(text = NULL), tickfont = list(family = "Arial", size = 16)),
+            showlegend = TRUE,
+            legend = list(font = list(size = 14), text = "Species", orientation = "h"))
+        
+        # Make the tooltip data
+        
+        interactive_plot
+        
       })
       
     }

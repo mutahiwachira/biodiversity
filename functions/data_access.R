@@ -43,8 +43,9 @@ qry_species <- function(data, species = NULL){
   if (is.null(species) || length(species) == 0) {
     # a temporary default!
     # TODO
+    three_random_species <- sample(unique(data$scientific_name), 3)
     df <- data |> 
-      sample_n(50)
+      filter(scientific_name %in% three_random_species)
     return(df)
   } else {
     df <- data |> 

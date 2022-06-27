@@ -1,0 +1,75 @@
+Create a backlog board in GitHub:
+- Finish adding descriptions to all the data.
+
+Some notes on the data
+- everything is just a string - you should probably change that
+- there's lots of redundant columns that just don't need to be there
+
+You need to get the sizes of just each single column of the full data
+
+Each row of the table records a certain observation of an individual (or possible multiple individuals) with a location and time.
+The location is encoded in decimal according to a certian schema and includes uncertainty as well.
+Ssome of the data has only two decimal places of accuracy and uses rounding to about 5000m uncertaintny using a formula coord = floor(coord * 20)/20
+Really the basic table of the data cannot be a naive plotting of the observations.
+There's so much silliness 
+Also when you plot these points you should use circles of fixed size of 5km radius -> it's more accurate and probably will have better performance
+
+Do an EDA on the Polish data to understand performance issues
+Some notes on size:
+- biggest columns are ID, occurenceID and catalog number and references which are these long strings of redundant information.
+- everything is a string which is what makes the DB so huge
+
+The table has just under 40 million rows.
+
+I think that when I create a clean view of the global data, and summarised it appropriately, it will be something that can be very easy to work with
+The size of the columns will come down several times:
+- appropriate column types
+- remove redundant information (ID) and useless information
+- bin and summarise observations together
+- simple table with location (double), date, count (int) and species names (small char)
+- multiple views into the data - e.g. for the time series, again you don't need to do that calculation in R and you can remove even more columns so that in R your statistics and matrix stuff is much, much faster
+
+DON'T GROUP BY VERNACULAR NAME - IT'S NOT CONSTANT!
+
+For UI, don't forget to use the multimedia, that'll be a big part of it
+
+--------------------------------->
+
+Performance strategies
+* Use a database or other file format like feather
+* Trim and clean and compact the data because you really don't need all of it
+* Create views in the db to do a lot of the upfront data processing for the same reason as above
+* Use the fastverse to write well benchmarked statistical functions for the analysis
+
+save the sql script used to generate the main table.
+
+# Measuring Biodiversity
+
+Two dimensions of data for a given area and/or time:
+- abundance of individuals
+- richness of species
+
+The relationship between these two numbers in a community defines its biodiversity
+
+But how can we possible talk about biodiversity in the context of an individual species?
+
+For an individual species, biodiversity means
+- rarity of the species: it is hard to find the species and you really have to search
+- niche/endemicness: the species is highly concentrated in one area, moreso than other species
+
+A given species only gives us an abundance number
+The richness number is something we calculate across species (literally the number of species)
+
+So there are four situations of interest:
+
+- Abundant species in a species rich environment
+- Non-abundant species in a species rich environment
+- Abundant species in a species poor environment
+- Non-abundant species in a species poor environment
+
+We may also have some concept of contribution to diversity, where we find the diversity of an area and understand how the presence of a particular species in the area contribute to its diversity and 
+
+This problem is actually so intricate and I can't afford to spend time on it
+
+MODULARIZATION
+-- Am I supposed to have the same namespace for different modules.

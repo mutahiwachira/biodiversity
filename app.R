@@ -1,21 +1,23 @@
 source("global.R")
 
-ui <- fluidPage(
-    tags$script(src = "toggle.js"),
-    navbarPage(
-      "Biodiversity",
-      
-      tabPanel(
-        "Occurence",
-        controls_ui("controls"),
-        br(),
-        # Show a plot of the generated distribution
-        fluidRow(
-          column(6, trendline_ui("trend-plot")),
-          column(6, occurence_map_ui("spatial-plot"))
-        )
+ui <- navbarPage(
+    tags$head(
+      tags$script(src = "toggle.js"),
+      tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+    ),
+    title = "Biodiversity",
+    tabPanel(
+      "Occurence",
+      div(class = "container",
+          style = "max-width: 1500px; height: 1500px;",
+          controls_ui("controls"),
+          
+          # Show a plot of the generated distribution
+          fluidRow(
+            column(6, trendline_ui("trend-plot")),
+            column(6, occurence_map_ui("spatial-plot"))
+          )
       )
-      
     )
 )
 
@@ -24,6 +26,8 @@ server <- function(input, output) {
   
   
   get_data <- reactive({
+    # We should only read from the database when updating the country selector
+    # The data is small enough to keep in memory for all cases except The Netherlands
     country <- input$`controls-country_selector`
     df <- db_get_occurence_data_by_country(country)
     return(df)

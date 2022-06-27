@@ -1,0 +1,19 @@
+/* Panel */
+.panel-default {
+    border: 0;
+    width: "100%";
+    height: "100%";
+}
+
+.panel-heading {
+    padding: 10px;
+    box-shadow: 1px 3px 6px 0px rgb(96 96 96);
+    border-radius: 0px;
+    font-weight: bold;
+    font-size: large;
+    border-color: #0000;
+}
+
+.compact-settings {
+    display: inline-block;
+}

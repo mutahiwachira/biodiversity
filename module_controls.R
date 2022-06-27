@@ -1,8 +1,9 @@
 controls_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    shiny::wellPanel(
-      shiny::selectizeInput(ns("search-bar"), label = "Choose a species", choices = NULL, multiple = TRUE),
+    main_box(
+      title = "What species would you like to learn more about?",
+      shiny::selectizeInput(ns("search-bar"), label = "Choose up to three", choices = NULL, multiple = TRUE, options = list(maxItems = 3), width = "800px"),
       actionButton(ns("search-button"), "Search", icon = icon("search")), # initialize empty, update with server.
       div(
         class = "pull-right",
@@ -29,7 +30,6 @@ controls_server <- function(id, data) {
       
       observeEvent(input$settings_button, {
         #shinyjs::toggle(id = paste0(id, "-app-settings"),anim = TRUE, asis = TRUE)
-        browser()
         session$sendCustomMessage(type = "toggle", message = paste0(id, "-app-settings"))
       })
       
