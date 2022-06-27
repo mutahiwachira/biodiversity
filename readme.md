@@ -91,6 +91,8 @@ The ideal way to deploy this is together with the 'species richness' metrics. A 
 
 The app was deployed to an AWS Ubuntu server with 30 GB of disk space and 8GB of memory. Access to the server is controlled and I am in posession of the private key to SSH into the server. HTTPS and a custom domain have not yet been set up.
 
+Data was loaded onto the server using FileZilla and a secure ssh connection. At no point was data uploaded to the repository and this practise should be continued.
+
 Docker was used to enclose the application state, with the `rocker/shinyverse` and `rocker/tidyverse` packages being used to include Shiny Server Open Source and RStudio Server Open Source respectively.
 
 `renv` was used to keep track of the libraries used in the project, but this was not included directly in the Dockerfile. So the design of the app is three quarters of the way to full reproducibility. However, the packages used were included statically and packaged together. See [mutahiwachira/biodiversity](https://hub.docker.com/repository/docker/mutahiwachira/biodiversity) for a docker container including Shiny Server and the packages needed for this project as at (27th June).
@@ -101,6 +103,7 @@ Improving the deployment process of the project would involve
 * Setting up a proper HTTPS configuration on the server, and purchasing a custom domain, and implementing a web server like NGINX to manage requests and possibly do load balancing.
 * Developing a CI/CD pipeline such that changes push to Github are pulled through to update the app if they pass automated unit checks
 * Including `renv` in the Dockerfile as per the `renv` [documentation](https://rstudio.github.io/renv/articles/docker.html), so that the Docker reads `renv` to better manage the packages included in the container.
+* Cleaning up the directory and file structure of the app.
 
 # Unit Testing and Documetation
 
