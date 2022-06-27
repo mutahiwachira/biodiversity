@@ -33,6 +33,8 @@ Here are some recommendations to improve the app:
     * Some jitter should be added to the spatial data to prevent overplotting, where two records overlap and one does not see the underlying one clearly. In the current implementation, transparency was used to achieve a similar effect, but a more careful design of the plotting element on the map could go further.
 * Finally, linking back to the original dataset in the dashboard would be useful, because it gives users somewhere to go and something to do to get more information.
 
+For a counter recommendation, I should say that I do not think it is important to try and load more than the currently limit of three species onto the maps at a time. Once users are really interested in going beyond three, it is more appropriate to switch to a species richness approach as described above, where the fundamental count is the number of *species*, and their *relative abundance* (as per Fisher) rather than the number of individuals. Perhaps the threshold is four or five at a time, instead of three, but beyond that and you are dealing with a fundamentally different request and therefore a different approach.
+
 # App Performance
 
 The original data as received was approximately 20GB in size. This was far to big to fit into memory and run the dashboard efficiently. Various scripts and Rmarkdown files in the 'analysis' folder will show the calculations and investigations that were performed regarding app performance. The following was found about the original dataset:
@@ -80,6 +82,10 @@ HTMLwidgets, plotly and leaflet provide many opportunities for more sophisticate
 Since the app is setup with a database already, it should be relatively simple to write information back to the database. Users should be able to save and bookmark their various filters. In the present form of the app, that may not be so useful, but if the app were to go into production, feature requests would eventually yield a subset of features that benefit heavily from personalization.
 
 Locale based personalization would be more important. The app is more intuitive if it starts in the country where the individual is located. In addition, animals are often known by common names in a local language. At the very least, localization of the common names in the database would improve usability of the app.
+
+## Usability
+
+The app currently includes very little help for the user. Some attempt were made to make the app intuitive by providing casually phrased headings, but this is not nerely sufficient. Captions, descriptions and modal dialogs (as in the `shinyhelper` package) would be useful in helping the users use the app and correctly understand the data.
 
 ## Multimedia
 
