@@ -111,7 +111,7 @@ Improving the deployment process of the project would involve
 * Including `renv` in the Dockerfile as per the `renv` [documentation](https://rstudio.github.io/renv/articles/docker.html), so that the Docker reads `renv` to better manage the packages included in the container.
 * Cleaning up the directory and file structure of the app.
 
-# Unit Testing and Documetation
+# Unit Testing and Documentation
 
 While every effort was made to program defensively and informatively, full unit testing has not yet been written for each function.
 
